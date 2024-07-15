@@ -36,7 +36,7 @@ function App() {
   return (
     <div className="app-container">
       <div className="bg">
-        <img src="/images/background.jpg" alt="background" />
+        <img src="https://img.goodfon.com/wallpaper/nbig/7/b8/pokemon-pokebol-pikachu.webp" alt="background" />
         <h1 className="centered-header">
           POKEMON EVOLUTION
         </h1>
