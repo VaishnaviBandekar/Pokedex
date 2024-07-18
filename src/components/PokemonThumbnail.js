@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faVolumeUp } from '@fortawesome/free-solid-svg-icons';
 import './styles/PokemonThumbnail.css';
+import Loader from './Loader';
 
+const PokemonThumbnail = ({ id, name, image, type, sound, stats }) => {
+  const [loading, setLoading] = useState(true);
 
-const PokemonThumbnail = ({ id, name, image, type }) => {
   const getTypeColor = () => {
     switch (type) {
       case 'grass':
@@ -46,12 +50,31 @@ const PokemonThumbnail = ({ id, name, image, type }) => {
     }
   };
 
+  const playSound = () => {
+    const audio = new Audio(sound);
+    audio.play();
+  };
+
   return (
     <div className="pokemon-thumbnail" style={{ backgroundColor: getTypeColor() }}>
-      <img src={image} alt={name} />
+      {loading && <Loader />}
+      <img
+        src={image}
+        alt={name}
+        style={{ display: loading ? 'none' : 'block' }}
+        onLoad={() => setLoading(false)}
+      />
       <h3>{name}</h3>
       <p>Type: {type}</p>
-      <p>ID: {id}</p>
+      <div className="stats">
+        <p>HP: {stats.hp}</p>
+        <p>Attack: {stats.attack}</p>
+        <p>Defense: {stats.defense}</p>
+        <p>Speed: {stats.speed}</p>
+      </div>
+      <div className="sound-icon" onClick={playSound}>
+        <FontAwesomeIcon icon={faVolumeUp} /> Play Sound
+      </div>
     </div>
   );
 };

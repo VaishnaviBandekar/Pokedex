@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
 import PokemonThumbnail from "./components/PokemonThumbnail";
+import Loader from "./components/Loader"; // Import the Loader component
 import './components/styles/App.css';
 
 function App() {
   const [allPokemons, setAllPokemons] = useState([]);
-  const [loadMore, setLoadMore] = useState('https://pokeapi.co/api/v2/pokemon?limit=20');
+  const [hasMore, setHasMore] = useState(true);
+  const [loadMore, setLoadMore] = useState('https://pokeapi.co/api/v2/pokemon?limit=10');
 
   const getAllPokemons = async () => {
     const res = await fetch(loadMore);
     const data = await res.json();
 
     setLoadMore(data.next);
+    setHasMore(data.next !== null);
 
     const uniquePokemons = [];
 
@@ -43,18 +47,33 @@ function App() {
       </div>
 
       <div className="pokemon-container">
-        <div className="all-container">
-          {allPokemons.map((pokemon) => (
-            <PokemonThumbnail
-              id={pokemon.id}
-              name={pokemon.name}
-              image={pokemon.sprites.other.dream_world.front_default}
-              type={pokemon.types[0].type.name}
-              key={pokemon.id} // Ensure key is unique for React to efficiently render
-            />
-          ))}
-        </div>
-        <button className="load-more" onClick={getAllPokemons}>Load more</button>
+        <InfiniteScroll 
+          style={{ overflowY: 'hidden' }} // Hide vertical scrollbar here
+          dataLength={allPokemons.length}
+          next={getAllPokemons}
+          hasMore={hasMore}
+          loader={<Loader />}
+          endMessage={<p style={{ textAlign: 'center' }}>All Pokemons loaded</p>}
+        >
+          <div className="all-container">
+            {allPokemons.map((pokemon) => (
+              <PokemonThumbnail
+                key={pokemon.id}
+                id={pokemon.id}
+                name={pokemon.name}
+                image={pokemon.sprites.other.dream_world.front_default}
+                type={pokemon.types[0].type.name}
+                sound={`https://pokemoncries.com/cries-old/${pokemon.id}.mp3`} // Example sound URL
+                stats={{
+                  hp: pokemon.stats[0].base_stat,
+                  attack: pokemon.stats[1].base_stat,
+                  defense: pokemon.stats[2].base_stat,
+                  speed: pokemon.stats[5].base_stat
+                }}
+              />
+            ))}
+          </div>
+        </InfiniteScroll>
       </div>
     </div>
   );
